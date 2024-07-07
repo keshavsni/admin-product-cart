@@ -3,53 +3,8 @@
 @section('title', 'Your Cart')
 
 @section('content')
-    <div class="container">
-        <h1>Your Cart</h1>
-        @if(session('success'))
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: '{{ session('success') }}'
-                });
-            </script>
-        @endif
-
-        @if(empty($cartItems))
-            <p>Your cart is empty.</p>
-        @else
-            <table class="cart-table">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($cartItems as $item)
-                        <tr>
-                            <td>{{ $item->name }}</td>
-                            <td>{{ $item->quantity }}</td>
-                            <td>${{ number_format($item->price, 2) }}</td>
-                            <td>${{ number_format($item->price * $item->quantity, 2) }}</td>
-                            <td>
-                                <form action="{{ route('cart.remove') }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this item?');">
-                                    @csrf
-                                    <input type="hidden" name="id" value="{{ $item->id }}">
-                                    <button type="submit" class="btn-remove">Remove</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <div class="cart-total">
-                <h3>Total: ${{ number_format(\Cart::getTotal(), 2) }}</h3>
-            </div>
-        @endif
+    <div class="container" id="cart-html">
+        
     </div>
 
     <style>
@@ -96,3 +51,36 @@
     <!-- Include SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection
+
+<script>
+
+    window.onload = (event) => {
+        alert();
+        loadCart();
+    };
+
+
+    function loadCart(){
+        $.ajax({
+                url: "{{ url('load-cart') }}",
+                type: "GET",
+                dataType: "HTML",
+                success:function(res){
+                    $("#cart-html").html(res);
+                }
+            })
+    }
+    function removeItem(){
+        if(confirm('Are you sure you want to remove this item?')){
+            $.ajax({
+                url: "{{ url('remove-from-cart') }}",
+                type: "DELETE",
+                dataType: "JSON",
+                success:function(res){
+                    console.log(res);
+                    loadCart();
+                }
+            })
+        }
+    }
+</script>

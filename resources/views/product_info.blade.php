@@ -101,8 +101,10 @@
             <a href="/" style="color: #fff; text-decoration: none;">MyShop</a>
         </div>
         <div class="cart-icon">
+            <a href="{{ route('cart.index') }}">
             <i class="fas fa-shopping-cart"></i>
-            <span class="cart-count">2</span>
+            <span class="cart-count">{{ session()->get('cart') ? count(session()->get('cart')) : 0 }}</span>
+            </a>
         </div>
     </nav>
     <div class="container">
@@ -123,8 +125,8 @@
                 <p>{{ $product->description }}</p>
                 <p class="price">${{ $product->price }}</p>
                 <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" class="quantity-input">
-                    <button type="button" class="btn">Add to Cart</button>
+                    <input type="number" id="quantity_{{ $product->id }}" name="quantity" value="1" min="1" class="quantity-input">
+                    <button type="button" data-product-id="{{ $product->id }}" onclick="addToCart(this)" class="btn">Add to Cart</button>
                 </form>
             </div>
         </div>
@@ -143,6 +145,23 @@
                 adaptiveHeight: true
             });
         });
+
+        function addToCart(elem){
+            let productId = $(elem).data('product-id');
+            let qty = $(`#quantity_${productId}`).val();
+            
+            $.ajax({
+                url: "{{ url('add-to-cart') }}"+"/"+productId,
+                type: "POST",
+                dataType: "JSON",
+                data:{'quantity':qty,'_token': "{{ csrf_token() }}"},
+                success:function(res){
+                    let items = res.items;
+                    $(".cart-count").html(items)
+                    console.log(res);
+                }
+            });
+        }
     </script>
 </body>
 </html>

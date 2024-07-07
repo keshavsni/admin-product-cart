@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
 use App\Models\Product;
 
@@ -28,9 +29,17 @@ Route::get('products/{product}', function(Product $product){
 })->name('prdouct.view');
 
 Route::get('cart', [CartController::class, 'index'])->name('cart.index');
-Route::get('add-to-cart/{id}', [CartController::class, 'addToCart'])->name('add.to.cart');
+Route::get('load-cart', [CartController::class, 'loadCart'])->name('load.cart');
+Route::post('add-to-cart/{id}', [CartController::class, 'addToCart'])->name('add.to.cart');
 Route::patch('update-cart', [CartController::class, 'update'])->name('update.cart');
 Route::delete('remove-from-cart', [CartController::class, 'remove'])->name('remove.from.cart');
+
+
+// Checkout
+
+Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('checkout', [CheckoutController::class, 'process'])->name('checkout.process');
+
 
 
 Route::group(['prefix' => 'admin'], function () {
